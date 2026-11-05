@@ -7,20 +7,51 @@
 
     <link rel="stylesheet" href="Escola_Parana.css">
 
-    <title>Alunos - Escola Paraná</title>
+    <div class="caixaTitulo">Cadastro</div>
+    <style>
+        .link-cadastros {
+            display: block;
+            width: fit-content;
+            margin: 20px auto;
+        }
+
+        .pesquisa-area {
+            position: absolute;
+            top: 25%;
+            right: 55%;
+        }
+
+        .pesquisa-area .caixaPesquisa {
+            position: relative;
+            top: auto;
+            right: auto;
+            margin: 0;
+        }
+
+        .cadastro-area {
+            position: absolute;
+            top: 25%;
+            right: 5%;
+        }
+
+        .cadastro-area .caixaCadastro {
+            position: relative;
+            top: auto;
+            left: auto;
+        }
+    </style>
 
 </head>
 
 <body>
-
-    <titulo>Arquivo de cdastros</titulo>
 
 
     <!-- ========================= -->
     <!-- PESQUISA DE ALUNOS -->
     <!-- ========================= -->
 
-      <div class="caixaPesquisa">
+        <div class="pesquisa-area">
+            <div class="caixaPesquisa">
 
     <h2>Pesquisar cadastro</h2>
     <p>
@@ -70,11 +101,19 @@
 
 </div>
 
+<a class="link-cadastros" href="Professores_Filtragem.html">
+    <button class="botao" type="button">
+        Ver cadastros
+    </button>
+</a>
+</div>
+
 
     <!-- ========================= -->
     <!-- CADASTRO DE ALUNOS -->
     <!-- ========================= -->
 
+    <div class="cadastro-area">
     <div class="caixaCadastro">
 
         <h2>Cadastrar</h2>
@@ -258,11 +297,7 @@
 
     </div>
 
-<a href="Lista_Alunos.html">
-    <button class="botao">
-        Ver alunos cadastrados
-    </button>
-</a>
+</div>
 
 
     <!-- BOTÃO VOLTAR -->

@@ -185,3 +185,88 @@ content: center;
     background-color: white;
         color: rgb(243, 30, 58);
 }
+
+.caixaPrincipal.filtros-professores {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: min(1050px, calc(100% - 40px));
+    margin: 150px auto 100px;
+    box-sizing: border-box;
+}
+
+.filtros-form {
+    display: grid;
+    grid-template-columns: 2fr repeat(3, 1fr) auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.campo-filtro label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.campo-filtro .form-container {
+    width: 100%;
+    height: 38px;
+}
+
+.botao-filtro {
+    margin: 0;
+    padding: 6px 18px;
+    font-size: 18px;
+}
+
+.importacao-csv {
+    display: inline-block;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.arquivo-csv {
+    display: none;
+}
+
+.mensagem-importacao {
+    min-height: 20px;
+    margin: 12px 0 0;
+}
+
+#contadorResultados {
+    margin: 20px 0 10px;
+}
+
+#listaProfessores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+}
+
+.cartao-professor {
+    padding: 14px;
+    border: 2px solid white;
+    border-radius: 12px;
+    background: rgb(31, 63, 168);
+}
+
+.cartao-professor h3 {
+    margin: 0 0 8px;
+}
+
+.cartao-professor p {
+    margin: 5px 0;
+}
+
+.status-pago { color: #a7f3b0; }
+.status-pendente { color: #ffd166; }
+
+@media (max-width: 760px) {
+    .caixaTitulo { font-size: 52px; }
+    .filtros-form { grid-template-columns: 1fr; }
+    .caixaPrincipal.filtros-professores {
+        width: calc(100% - 20px);
+        margin-top: 110px;
+    }
+    .botao-filtro { width: 100%; }
+}

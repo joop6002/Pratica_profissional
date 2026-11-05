@@ -4,39 +4,278 @@
 <head>
     <link rel="stylesheet" href="Escola_Parana.css">
     <meta charset="UTF-8">
+  
+
 
 </head>
 
 <body>
+<div class="caixaTitulo">Filtragem
+</div>
 
-<div class="caixaTitulo">
-      BuscaEscola</div>
+<div class="caixaPrincipal filtros-professores">
 
-        <div class="caixaPrincipal">
-
-            
-<div id="mensagemPagamento"></div>
-
-
-
+    <form id="formFiltros" class="filtros-form">
+        <div class="campo-filtro">
+            <label for="buscaCadastro">Nome, código ou informação</label>
+            <input class="form-container" id="buscaCadastro" type="search" placeholder="Ex.: Matemática ou A001">
         </div>
-        <!-- BOTÃO VOLTAR -->
 
+        <div class="campo-filtro">
+            <label for="filtroTipo">Tipo de cadastro</label>
+            <select class="form-container" id="filtroTipo">
+                <option value="">Todos</option>
+                <option value="Aluno">Alunos</option>
+                <option value="Professor">Professores</option>
+                <option value="Disciplina">Disciplinas</option>
+            </select>
+        </div>
 
-        <p>
+        <div class="campo-filtro">
+            <label for="filtroDisciplina">Disciplina</label>
+            <select class="form-container" id="filtroDisciplina">
+                <option value="">Todas</option>
+            </select>
+        </div>
 
-            <a href="Pagina_de_login.html">
+        <div class="campo-filtro">
+            <label for="filtroPagamento">Pagamento</label>
+            <select class="form-container" id="filtroPagamento">
+                <option value="">Todos</option>
+                <option value="pago">Pago</option>
+                <option value="pendente">Pendente</option>
+            </select>
+        </div>
 
-    <button class="botaoVoltar">
-        voltar
-    </button>
+        <label class="botao botao-filtro importacao-csv" for="arquivoCsv">
+            Importar CSV
+            <input id="arquivoCsv" class="arquivo-csv" type="file" accept=".csv,text/csv">
+        </label>
 
-            </a>
+        <button class="botao botao-filtro" type="button" id="limparFiltros">Limpar</button>
+    </form>
 
-        </p>
-    <div class="caixaNome">
-         Kamili, José
-    </div>
+    <p id="mensagemImportacao" class="mensagem-importacao" aria-live="polite"></p>
+    <p id="contadorResultados" aria-live="polite"></p>
+    <section id="listaProfessores" aria-live="polite"></section>
+</main>
+
+<p>
+    <a href="Professor_Menu_Opcoes.html">
+        <button class="botaoVoltar" type="button">voltar</button>
+    </a>
+</p>
+
+<div class="caixaNome">Kamili, José</div>
+
+<script src="banco.js"></script>
+<script>
+    const buscaCadastro = document.getElementById("buscaCadastro");
+    const filtroTipo = document.getElementById("filtroTipo");
+    const filtroDisciplina = document.getElementById("filtroDisciplina");
+    const filtroPagamento = document.getElementById("filtroPagamento");
+    const listaProfessores = document.getElementById("listaProfessores");
+    const contadorResultados = document.getElementById("contadorResultados");
+    const mensagemImportacao = document.getElementById("mensagemImportacao");
+    let cadastros = [
+        ...alunos.map(aluno => ({ tipo: "Aluno", dados: aluno })),
+        ...professores.map(professor => ({ tipo: "Professor", dados: professor })),
+        ...disciplinas.map(disciplina => ({ tipo: "Disciplina", dados: disciplina }))
+    ];
+
+    function normalizar(valor) {
+        return valor
+            .toLocaleLowerCase("pt-BR")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function formatarSalario(valor) {
+        return valor.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+        });
+    }
+
+    function valorParaBusca(valor) {
+        return Array.isArray(valor) || (valor && typeof valor === "object") ? "" : String(valor ?? "");
+    }
+
+    function rotuloCampo(campo) {
+        const rotulos = {
+            codigo: "Código",
+            nome: "Nome",
+            disciplina: "Disciplina",
+            formacao: "Formação",
+            salario: "Salário",
+            pago: "Pagamento",
+            email: "E-mail",
+            idade: "Idade",
+            turma: "Turma",
+            cargaHoraria: "Carga horária",
+            professorCodigo: "Código do professor",
+            professor: "Professor",
+            diaSemana: "Dia da semana",
+            horaInicio: "Início",
+            horaFim: "Fim"
+        };
+
+        return rotulos[campo] || campo;
+    }
+
+    function formatarValor(campo, valor) {
+        if (campo === "salario") {
+            return formatarSalario(valor);
+        }
+
+        if (campo === "pago") {
+            return valor ? "Pago" : "Pendente";
+        }
+
+        return valor;
+    }
+
+    function mostrarCadastros() {
+        const termo = normalizar(buscaCadastro.value.trim());
+        const tipo = filtroTipo.value;
+        const disciplina = filtroDisciplina.value;
+        const pagamento = filtroPagamento.value;
+
+        const resultados = cadastros
+            .filter(cadastro => {
+                const texto = normalizar(Object.values(cadastro.dados).map(valorParaBusca).join(" "));
+                const correspondeTexto = texto.includes(termo);
+                const correspondeTipo = !tipo || cadastro.tipo === tipo;
+                const correspondeDisciplina = !disciplina ||
+                    cadastro.dados.disciplina === disciplina ||
+                    cadastro.dados.nome === disciplina;
+                const correspondePagamento = !pagamento ||
+                    (cadastro.tipo === "Professor" &&
+                        ((pagamento === "pago" && cadastro.dados.pago) ||
+                        (pagamento === "pendente" && !cadastro.dados.pago)));
+
+                return correspondeTexto && correspondeTipo && correspondeDisciplina && correspondePagamento;
+            })
+            .sort((a, b) => String(a.dados.nome).localeCompare(String(b.dados.nome), "pt-BR"));
+
+        contadorResultados.textContent = `${resultados.length} cadastro(s) encontrado(s)`;
+        listaProfessores.innerHTML = resultados.length ? resultados.map(cadastro => {
+            const campos = Object.entries(cadastro.dados)
+                .filter(([campo, valor]) => !["gradeHoraria", "provas"].includes(campo) && valor !== undefined && valor !== null);
+            const status = cadastro.tipo === "Professor" ? `
+                <p class="${cadastro.dados.pago ? "status-pago" : "status-pendente"}">
+                    <strong>Status:</strong> ${cadastro.dados.pago ? "Pagamento realizado" : "Pagamento pendente"}
+                </p>
+            ` : "";
+
+            return `
+            <article class="cartao-professor">
+                <h3>${cadastro.dados.nome || cadastro.dados.codigo}</h3>
+                <p><strong>Tipo:</strong> ${cadastro.tipo}</p>
+                ${campos.map(([campo, valor]) => `<p><strong>${rotuloCampo(campo)}:</strong> ${formatarValor(campo, valor)}</p>`).join("")}
+                ${status}
+            </article>
+            `;
+        }).join("") : "<p>Nenhum cadastro corresponde aos filtros informados.</p>";
+    }
+
+    function adicionarDisciplinasAoFiltro(lista) {
+        const disciplinasExistentes = new Set(
+            [...filtroDisciplina.options].map(opcao => opcao.value)
+        );
+
+        [...new Set(lista.map(professor => professor.disciplina))]
+            .filter(disciplina => disciplina && !disciplinasExistentes.has(disciplina))
+            .sort((a, b) => a.localeCompare(b, "pt-BR"))
+            .forEach(disciplina => {
+                filtroDisciplina.insertAdjacentHTML("beforeend", `<option value="${disciplina}">${disciplina}</option>`);
+            });
+    }
+
+    function lerLinhaCSV(linha, separador) {
+        const valores = [];
+        let valor = "";
+        let dentroDeAspas = false;
+
+        for (let indice = 0; indice < linha.length; indice += 1) {
+            const caractere = linha[indice];
+            const proximo = linha[indice + 1];
+
+            if (caractere === '"' && dentroDeAspas && proximo === '"') {
+                valor += '"';
+                indice += 1;
+            } else if (caractere === '"') {
+                dentroDeAspas = !dentroDeAspas;
+            } else if (caractere === separador && !dentroDeAspas) {
+                valores.push(valor.trim());
+                valor = "";
+            } else {
+                valor += caractere;
+            }
+        }
+
+        valores.push(valor.trim());
+        return valores;
+    }
+
+    function importarCSV(evento) {
+        const arquivo = evento.target.files[0];
+
+        if (!arquivo) {
+            return;
+        }
+
+        const leitor = new FileReader();
+        leitor.onload = () => {
+            const linhas = leitor.result.split(/\r?\n/).filter(linha => linha.trim());
+            const separador = linhas[0].includes(";") ? ";" : ",";
+            const cabecalhos = lerLinhaCSV(linhas.shift(), separador).map(cabecalho => cabecalho.toLowerCase());
+            const registrosImportados = linhas.map(linha => {
+                const valores = lerLinhaCSV(linha, separador);
+                return Object.fromEntries(cabecalhos.map((cabecalho, indice) => [cabecalho, valores[indice] || ""]));
+            }).filter(registro => registro.codigo && registro.nome);
+
+            const professoresImportados = registrosImportados.map(registro => ({
+                codigo: registro.codigo.toUpperCase(),
+                nome: registro.nome,
+                disciplina: registro.disciplina,
+                formacao: registro.formacao,
+                salario: Number(registro.salario.replace(",", ".")) || 0,
+                pago: ["true", "1", "sim", "pago"].includes(registro.pago.toLowerCase()),
+                email: registro.email
+            }));
+
+            const codigosImportados = new Set(professoresImportados.map(professor => professor.codigo));
+            cadastros = cadastros.filter(cadastro =>
+                cadastro.tipo !== "Professor" || !codigosImportados.has(cadastro.dados.codigo)
+            );
+            cadastros.push(...professoresImportados.map(professor => ({ tipo: "Professor", dados: professor })));
+            adicionarDisciplinasAoFiltro(professoresImportados);
+            mensagemImportacao.textContent = `${professoresImportados.length} professor(es) importado(s) de ${arquivo.name}.`;
+            mostrarCadastros();
+        };
+
+        leitor.readAsText(arquivo, "UTF-8");
+        evento.target.value = "";
+    }
+
+    adicionarDisciplinasAoFiltro([
+        ...professores.map(professor => professor.disciplina),
+        ...disciplinas.map(disciplina => ({ disciplina: disciplina.nome }))
+    ].map(disciplina => typeof disciplina === "string" ? { disciplina } : disciplina));
+
+    buscaCadastro.addEventListener("input", mostrarCadastros);
+    filtroTipo.addEventListener("change", mostrarCadastros);
+    filtroDisciplina.addEventListener("change", mostrarCadastros);
+    filtroPagamento.addEventListener("change", mostrarCadastros);
+    document.getElementById("arquivoCsv").addEventListener("change", importarCSV);
+    document.getElementById("limparFiltros").addEventListener("click", () => {
+        document.getElementById("formFiltros").reset();
+        mostrarCadastros();
+    });
+
+    mostrarCadastros();
+</script>
 
 </body>
 
