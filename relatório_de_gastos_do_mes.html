@@ -1,1 +1,58 @@
+// =============================================
+// REGISTRAR PAGAMENTO
+// =============================================
 
+orcamento -= professor.salario;
+
+professor.pago = true;
+
+// Data e mês do pagamento
+
+let agora = new Date();
+
+let anoPagamento = agora.getFullYear();
+
+let mesPagamento = String(
+    agora.getMonth() + 1
+).padStart(2, "0");
+
+// =============================================
+// ADICIONAR AO HISTÓRICO
+// =============================================
+
+historicoPagamentos.push({
+
+    codigo: professor.codigo,
+
+    nome: professor.nome,
+
+    disciplina: professor.disciplina,
+
+    salario: professor.salario,
+
+    dataPagamento: agora.toISOString(),
+
+    mesPagamento: `${anoPagamento}-${mesPagamento}`
+
+});
+
+// =============================================
+// SALVAR NO NAVEGADOR
+// =============================================
+
+localStorage.setItem(
+    "historicoPagamentos",
+    JSON.stringify(historicoPagamentos)
+);
+
+localStorage.setItem(
+    "orcamentoEscola",
+    String(orcamento)
+);
+
+statusProfessores[professor.codigo] = true;
+
+localStorage.setItem(
+    "statusProfessores",
+    JSON.stringify(statusProfessores)
+);
