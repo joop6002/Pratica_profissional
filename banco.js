@@ -8,7 +8,11 @@
 
 let orcamentoInicial = 50000;
 
-let orcamento = orcamentoInicial;
+let orcamentoSalvo = localStorage.getItem("orcamentoEscola");
+
+let orcamento = orcamentoSalvo === null
+    ? orcamentoInicial
+    : Number(orcamentoSalvo);
 
 // =========================================
 // PROFESSORES
